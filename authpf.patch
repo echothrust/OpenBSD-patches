@@ -1,0 +1,95 @@
+Index: usr.sbin/authpf/authpf.c
+===================================================================
+RCS file: /cvs/src/usr.sbin/authpf/authpf.c,v
+retrieving revision 1.123
+diff -u -r1.123 authpf.c
+--- usr.sbin/authpf/authpf.c	21 Jan 2015 21:50:32 -0000	1.123
++++ usr.sbin/authpf/authpf.c	8 Jun 2015 11:15:07 -0000
+@@ -57,6 +57,7 @@
+ char	anchorname[PF_ANCHOR_NAME_SIZE] = "authpf";
+ char	rulesetname[PATH_MAX - PF_ANCHOR_NAME_SIZE - 2];
+ char	tablename[PF_TABLE_NAME_SIZE] = "authpf_users";
++char	authpf_conf[PATH_MAX]=PATH_CONFFILE;
+ int	user_ip = 1;	/* controls whether $user_ip is set */
+ 
+ FILE	*pidfp;
+@@ -93,10 +94,26 @@
+ 
+ 	if (strcmp(__progname, "-authpf-noip") == 0)
+                 user_ip = 0;
++	/*
++	 * This modification gives authpf the ability to load different
++	 * configuration files based on the filename of the binary.
++	 * This is achieved in a non intrusive way.
++	 *
++	 * usage:
++	 * ln /usr/sbin/authpf /usr/sbin/authpf-name
++	 * touch /etc/authpf/authpf-name.conf
++	 */
++	if (user_ip == 1 && strcmp(__progname, "-authpf") != 0) {
++		n=snprintf(authpf_conf,sizeof(authpf_conf),PATH_CONFFMT,__progname+1);
++		if (n < 0 || (u_int)n >= sizeof(authpf_conf)) {
++			syslog(LOG_ERR, "path too long");
++			exit(1);
++		}
++	}
+ 
+-	config = fopen(PATH_CONFFILE, "r");
++	config = fopen(authpf_conf, "r");
+ 	if (config == NULL) {
+-		syslog(LOG_ERR, "cannot open %s (%m)", PATH_CONFFILE);
++		syslog(LOG_ERR, "cannot open %s (%m)", authpf_conf);
+ 		exit(1);
+ 	}
+ 
+@@ -295,7 +312,7 @@
+ 	}
+ 
+ 	if (read_config(config)) {
+-		syslog(LOG_ERR, "invalid config file %s", PATH_CONFFILE);
++		syslog(LOG_ERR, "invalid config file %s", authpf_conf);
+ 		do_death(0);
+ 	}
+ 
+@@ -355,7 +372,7 @@
+ }
+ 
+ /*
+- * reads config file in PATH_CONFFILE to set optional behaviours up
++ * reads config file in authpf_conf to set optional behaviours up
+  */
+ static int
+ read_config(FILE *f)
+@@ -378,7 +395,7 @@
+ 			continue;
+ 		if (buf[len - 1] != '\n' && !feof(f)) {
+ 			syslog(LOG_ERR, "line %d too long in %s", i,
+-			    PATH_CONFFILE);
++			    authpf_conf);
+ 			return (1);
+ 		}
+ 		buf[len - 1] = '\0';
+@@ -417,7 +434,7 @@
+ 
+ parse_error:
+ 	fclose(f);
+-	syslog(LOG_ERR, "parse error, line %d of %s", i, PATH_CONFFILE);
++	syslog(LOG_ERR, "parse error, line %d of %s", i, authpf_conf);
+ 	return (1);
+ }
+ 
+Index: usr.sbin/authpf/pathnames.h
+===================================================================
+RCS file: /cvs/src/usr.sbin/authpf/pathnames.h,v
+retrieving revision 1.9
+diff -u -r1.9 pathnames.h
+--- usr.sbin/authpf/pathnames.h	15 Jan 2013 23:03:37 -0000	1.9
++++ usr.sbin/authpf/pathnames.h	8 Jun 2015 11:15:07 -0000
+@@ -26,6 +26,7 @@
+  */
+ 
+ #define PATH_CONFFILE		"/etc/authpf/authpf.conf"
++#define PATH_CONFFMT		"/etc/authpf/%s.conf"
+ #define PATH_ALLOWFILE		"/etc/authpf/authpf.allow"
+ #define PATH_PFRULES		"/etc/authpf/authpf.rules"
+ #define PATH_PROBLEM		"/etc/authpf/authpf.problem"
