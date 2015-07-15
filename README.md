@@ -1,4 +1,13 @@
-# Per authpf binary configuration
+# OpenBSD patches
+This project hosts some of the patches we've been working on. This project was 
+initially named **`OpenBSD-authpf`** but since the need for more 
+modifications came, we thought it would be better not to split them into 
+separate projects but rather host them under a single one. 
+
+Please make sure you update your git configuration files if you used the old 
+repository names.
+
+## Per authpf binary configuration
 This code changes the way `authpf` looks for the configuration file 
 `/etc/authpf/authpf.conf`. The change forces authpf to read a different 
 configuration file based on the name of the executable. This is change is 
@@ -37,7 +46,7 @@ In order to activate the feature follow the normal authpf instructions and creat
 echo "anchor=authpf_offense\ntable=offense_authenticated\n">/etc/authpf/authpf-offense.conf
 ```
 
-# Developer details
+### Developer details
 
 Code cloned from OpenBSD -current with the following command:
 
