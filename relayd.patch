@@ -4,7 +4,7 @@ RCS file: /cvs/src/usr.sbin/relayd/check_tcp.c,v
 retrieving revision 1.46
 diff -u -r1.46 check_tcp.c
 --- usr.sbin/relayd/check_tcp.c	22 Jan 2015 17:42:09 -0000	1.46
-+++ usr.sbin/relayd/check_tcp.c	15 Jul 2015 13:16:34 -0000
++++ usr.sbin/relayd/check_tcp.c	15 Jul 2015 13:50:34 -0000
 @@ -344,8 +344,8 @@
  		return (1);
  	}
