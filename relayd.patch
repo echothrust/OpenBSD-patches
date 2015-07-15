@@ -1,0 +1,18 @@
+Index: usr.sbin/relayd/check_tcp.c
+===================================================================
+RCS file: /cvs/src/usr.sbin/relayd/check_tcp.c,v
+retrieving revision 1.46
+diff -u -r1.46 check_tcp.c
+--- usr.sbin/relayd/check_tcp.c	22 Jan 2015 17:42:09 -0000	1.46
++++ usr.sbin/relayd/check_tcp.c	15 Jul 2015 13:16:34 -0000
+@@ -344,8 +344,8 @@
+ 		return (1);
+ 	}
+ 	if (code != cte->table->conf.retcode) {
+-		log_debug("%s: %s failed (invalid HTTP code returned)",
+-		    __func__, host->conf.name);
++		log_debug("%s: %s failed (invalid HTTP code returned %d)",
++		    __func__, host->conf.name,code);
+ 		host->he = HCE_HTTP_CODE_FAIL;
+ 		host->up = HOST_DOWN;
+ 	} else {

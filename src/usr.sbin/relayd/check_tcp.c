@@ -344,8 +344,8 @@ check_http_code(struct ctl_tcp_event *cte)
 		return (1);
 	}
 	if (code != cte->table->conf.retcode) {
-		log_debug("%s: %s failed (invalid HTTP code returned)",
-		    __func__, host->conf.name);
+		log_debug("%s: %s failed (invalid HTTP code returned %d)",
+		    __func__, host->conf.name,code);
 		host->he = HCE_HTTP_CODE_FAIL;
 		host->up = HOST_DOWN;
 	} else {
